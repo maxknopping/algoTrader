@@ -7,6 +7,8 @@ ENV APCA_API_SECRET_KEY=$APCA_API_SECRET_KEY
 ENV APCA_API_KEY_ID=$APCA_API_KEY_ID
 ENV APCA_API_BASE_URL=$APCA_API_BASE_URL
 RUN mkdir /app
+RUN pip freeze > requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 WORKDIR /app
 CMD pylivetrader run -f algo.py --backend-config config.json
