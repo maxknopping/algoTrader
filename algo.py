@@ -27,6 +27,11 @@ def initialize(context):
     context.spy = symbol('SPY')
     context.TF_filter = False
     context.TF_lookback = 126
+    context.function_bool = True
+    
+    schedule_function(func=initial_trade,  
+                      date_rule=date_rules.every_day(),  
+                      time_rule=time_rules.market_close(minutes=30))  
     
     #Set number of securities to buy and bonds fund (when we are out of stocks)
     context.Target_securities_to_buy = 20.0
@@ -50,6 +55,11 @@ def before_trading_start(context, data):
     
     context.output = algo.pipeline_output('pipeline')
     context.security_list = context.output.index
+
+def initial_trade(context, data):
+    if context.function_bool == True:  
+            trade(context,data)  
+            context.function_bool = False
         
 def trade(context, data):
     ############Trend Following Regime Filter############
