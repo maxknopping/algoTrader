@@ -15,9 +15,10 @@ from pipeline_live.data.iex.fundamentals import IEXKeyStats
 from pylivetrader.api import schedule_function
 import numpy as np
 from pipeline_live.data.iex.factors import AverageDollarVolume
+
 def initialize(context):
     
-    attach_pipeline(make_pipeline(), 'pipeline')       
+    context.attach_pipeline(make_pipeline(), 'pipeline') 
     
     #Schedule Functions
     schedule_function(trade, date_rules.month_end() , time_rules.market_close(minutes=30))
@@ -53,7 +54,7 @@ def make_pipeline():
     return pipe
 def before_trading_start(context, data):
     
-    context.output = algo.pipeline_output('pipeline')
+    context.output = context.pipeline_output('pipeline')
     context.security_list = context.output.index
 
 def initial_trade(context, data):
