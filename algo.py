@@ -12,14 +12,15 @@ import pylivetrader.algorithm as algo
 from zipline.pipeline import Pipeline, CustomFactor
 from pipeline_live.data.alpaca.pricing import USEquityPricing
 from pipeline_live.data.iex.fundamentals import IEXKeyStats
+from pipeline_live.data.sources.iex import list_symbols
 from pylivetrader.api import schedule_function
 import numpy as np
 from pipeline_live.data.iex.factors import AverageDollarVolume
+from pipeline_live.engine import LivePipelineEngine
 
 def initialize(context):
-    
-    context.attach_pipeline(make_pipeline(), 'pipeline') 
-    
+
+    context.attach_pipeline(make_pipeline(), 'pipeline')
     #Schedule Functions
     schedule_function(trade, date_rules.month_end() , time_rules.market_close(minutes=30))
     schedule_function(trade_bonds, date_rules.month_end(), time_rules.market_close(minutes=20))
@@ -47,7 +48,6 @@ def initialize(context):
     context.top_n_relative_momentum_to_buy = 20 #Number to buy
     
 def make_pipeline():
-    # Base universe set to the Q500US
     universe = AverageDollarVolume(window_length=300).top(500)
     roic = IEXKeyStats.returnOnCapital.latest
     pipe = Pipeline(columns={'roic': roic},screen=universe)
@@ -135,7 +135,3 @@ class MFI(CustomFactor):
         money_ratio = np.sum(pos_money_flow, axis=0) / np.sum(neg_money_flow, axis=0)
         # MFI  
         out[:] = 100. - (100. / (1. + money_ratio))
-        
-    
-def handle_data(context, data):
-    pass
