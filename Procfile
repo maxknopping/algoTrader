@@ -1,1 +1,1 @@
-worker: pylivetrader run -f algo.py --backend-config config.json --storage-engine redis
+worker: pylivetrader run -f algo.py --backend-config config.json --storage-engine redis --data-frequency daily

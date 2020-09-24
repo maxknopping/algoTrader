@@ -2,5 +2,5 @@
 "key_id": "PKNQU5OBRK49DYNQXIHW",
 "secret": "3f/RlTV32XZAqCIHUOP2QLCVtKPe47Thr6YDxcaU",
 "base_url": "https://paper-api.alpaca.markets",
-"use_polygon": false
+"use_polygon": true
 }

@@ -12,7 +12,7 @@ import pylivetrader.algorithm as algo
 from zipline.pipeline import Pipeline, CustomFactor
 from pipeline_live.data.alpaca.pricing import USEquityPricing
 from pipeline_live.data.iex.fundamentals import IEXKeyStats
-from pipeline_live.data.sources.iex import list_symbols
+from pipeline_live.data.sources.polygon import list_symbols
 from pylivetrader.api import schedule_function
 import numpy as np
 from pipeline_live.data.iex.factors import AverageDollarVolume
@@ -33,7 +33,7 @@ def initialize(context):
     
     schedule_function(func=initial_trade,  
                       date_rule=date_rules.every_day(),  
-                      time_rule=time_rules.market_close(minutes=30))  
+                      time_rule=time_rules.market_close(minutes=30)) 
     
     #Set number of securities to buy and bonds fund (when we are out of stocks)
     context.Target_securities_to_buy = 20.0
@@ -52,17 +52,23 @@ def make_pipeline():
     roic = IEXKeyStats.returnOnCapital.latest
     pipe = Pipeline(columns={'roic': roic},screen=universe)
     return pipe
+
+    print("[INFO] Make pipeline")
 def before_trading_start(context, data):
     
     context.output = context.pipeline_output('pipeline')
     context.security_list = context.output.index
+    print("[INFO] Before Trading Start")
 
 def initial_trade(context, data):
     if context.function_bool == True:  
             trade(context,data)  
             context.function_bool = False
         
+    print("[INFO] Initial Trade")
 def trade(context, data):
+
+    print("[INFO] Trade")
     ############Trend Following Regime Filter############
     TF_hist = data.history(context.spy , "close", 140, "1d")
     TF_check = TF_hist.pct_change(context.TF_lookback).iloc[-1]
@@ -73,14 +79,16 @@ def trade(context, data):
     ############Trend Following Regime Filter End############
     
     #DataFrame of Prices for our 500 stocks
-    prices = data.history(context.security_list,"close", 180, "1d")      
+    #     
     #DF here is the output of our pipeline, contains 500 rows (for 500 stocks) and one column - ROE
     df = context.output  
     
     #Grab top 50 stocks with best ROE
     top_n_roic = df.nlargest(context.top_n_roic_to_buy, "roic")
+    
     #Calculate the momentum of our top ROE stocks   
     #Grab stocks with best momentum    
+    prices = data.history(top_n_roic.index,"close", 180, "1d")  
     #top_n_by_momentum = top_n_roic.nsmallest(context.top_n_relative_momentum_to_buy, "mfi")
     
     quality_momentum = prices[top_n_roic.index][:-context.momentum_skip_days].pct_change(context.relative_momentum_lookback).iloc[-1]

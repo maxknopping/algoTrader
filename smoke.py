@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- as algo
 
-from newAlgo import algo
+import algo
 from pylivetrader.testing.smoke import harness
 
 
